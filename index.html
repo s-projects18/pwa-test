@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="manifest" href="/manifest.json">
+</head>
+    <body><p>Hello world</p></body>
+    <script>
+    if ('serviceWorker' in navigator) {
+    console.log(333);
+        navigator.serviceWorker.register('sw.js');
+    }
+    </script>
+</html>
