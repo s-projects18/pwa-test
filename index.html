@@ -2,14 +2,25 @@
 <html>
 <head>
     <link rel="manifest" href="/manifest.json">
+    <style type="text/css">
+        #colorPic {cursor:pointer;}
+        caption {display:block;}
+    </style>
+    <meta charset="utf-8">
 </head>
     <body>
-        <p>Hello world</p>
-        <img src="/icons/red.png" width="100" height="100">
+        <p>Hello world!</p>
+        <figure><img alt="Click to change image" title="Click to change image" id="colorPic" src="/icons/red.png" width="100" height="100">
+        <figcaption>Chrome: Application -&gt; Cache storage</figcaption>
+        </figure>
     </body>
     <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js');
+    }
+    p = document.getElementById('colorPic');
+    p.onclick = function() {
+        p.setAttribute("src", (p.getAttribute("src")=="/icons/green.png")?"/icons/red.png":"/icons/green.png");
     }
     </script>
 </html>
