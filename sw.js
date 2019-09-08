@@ -1,21 +1,26 @@
 // see: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers
-var cacheName = 'pwa-test-v1';
+
+// on Service worker changes that leads to another cache-content: set a new cache version
+// old version is cached with old Service worker until it is updated
+// clear old cache with activate-event (limited cache-space in browser!)
+var cacheName = 'pwa-test-v4';
+
 var contentToCache = [
     '/index.html',
     '/icons/pwa-icon-192.png',
     '/icons/pwa-icon-512.png',
     '/icons/red.png',
-    //'/icons/green.png'
+    //'/icons/green.png' > added by client-js
 ];
 
 // make content available offline by adding it to cache
 self.addEventListener('install', function(e) {
-    console.log('[Service Worker] Install');
+    console.log('Install');
     // don't install before Promise is returned
     e.waitUntil(
         // caches: CacheStorage object provided in Service Worker scope
         caches.open(cacheName).then((cache) => {
-            console.log('[Service Worker] Caching all');
+            console.log('Caching all');
             return cache.addAll(contentToCache); // return Promise
         }).catch((err) => {
             console.log(err);
@@ -27,8 +32,10 @@ self.addEventListener('install', function(e) {
 // customs responses can be used instead of default response 
 // used resource must be in cache
 self.addEventListener('fetch', function(e){
+    console.log('Used cache', cacheName);
     console.log('Fetch resource '+e.request.url);
     
+    // FetchEvent.respondWith: like a proxy server between app and network
     e.respondWith(
         caches.match(e.request).then((r) => {
         
@@ -50,8 +57,19 @@ self.addEventListener('fetch', function(e){
 });
 
 
-// ??? called only once
-// e.g. delete not needed files
+// delete old cache
+// test: uninstall app but do NOT delete app-data
 self.addEventListener('activate', function(e) {
-    console.log('[Service Worker] Activate');
+    console.log('activate');
+
+    e.waitUntil(
+        caches.keys().then((keyList) => {
+            return Promise.all(keyList.map((key) => {
+                if(cacheName.indexOf(key) === -1) {
+                    console.log("delete", key);
+                    return caches.delete(key);
+                }                
+            }))         
+        })
+    );
 });
